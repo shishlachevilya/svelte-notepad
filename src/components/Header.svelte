@@ -1,19 +1,22 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from "svelte";
+  import { getLocalNotes } from "../helpres/getLocalNotes.js";
+  import { setLocalNotes } from "../helpres/setLocalNotes.js";
+  import BigButton from "./BigButton.svelte";
 
   const dispatch = createEventDispatcher();
-  let src = 'https://shishlachevilya.github.io/images/logo.svg';
-  let alt = 'notepad logo';
-  let value = '';
+  let src = "https://shishlachevilya.github.io/images/logo.svg";
+  let alt = "notepad logo";
+  let value = "";
 
   function openEditor() {
-    dispatch('modal', {
+    dispatch("modal", {
       isOpen: true
     });
   }
 
   function searchNotes() {
-    dispatch('search', {
+    dispatch("search", {
       value: value
     });
   }
@@ -33,14 +36,7 @@
     background-color: #2196f3;
     z-index: 999;
     box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-    0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-
-    &__button {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translate(-50%, 50%);
-    }
+      0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   }
 
   .logo {
@@ -115,56 +111,6 @@
   .search-form__input::placeholder {
     color: rgba(255, 255, 255, 0.5);
   }
-
-  .action {
-    display: inline-flex;
-    margin: 0 4px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background-color: #7c7879;
-    color: #fff;
-    cursor: pointer;
-    outline: none;
-    user-select: none;
-    box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
-    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-    &:hover {
-      background-color: #2196f3;
-    }
-
-    &:active {
-      box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.2),
-      0px 12px 17px 2px rgba(0, 0, 0, 0.14),
-      0px 5px 22px 4px rgba(0, 0, 0, 0.12);
-    }
-
-    &__icon {
-      display: block;
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      font-size: 24px;
-
-      &--large {
-        width: 56px;
-        height: 56px;
-        line-height: 56px;
-        font-size: 24px;
-      }
-    }
-
-    &--primary {
-      background-color: #e10050;
-
-      &:hover {
-        background-color: #9d0038;
-      }
-    }
-  }
 </style>
 
 <header class="page-header">
@@ -175,12 +121,15 @@
     </a>
   </h1>
 
-  <button class="action action--primary page-header__button" data-action="open-editor" on:click={openEditor}>
-    <i class="material-icons action__icon action__icon--large">add</i>
-  </button>
+  <BigButton icon={'add'} action={'open-editor'} on:click={openEditor} />
 
   <form class="search-form">
-    <input type="text" class="search-form__input" placeholder="Search..." bind:value={value} on:input={searchNotes}/>
+    <input
+      type="text"
+      class="search-form__input"
+      placeholder="Search..."
+      bind:value
+      on:input={searchNotes} />
     <i class="material-icons search-form__icon">search</i>
   </form>
 </header>
