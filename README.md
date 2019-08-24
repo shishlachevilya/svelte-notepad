@@ -1,3 +1,5 @@
+[use notes in localStore](https://gennadiy1970.github.io/svelte-notepad/public/)
+
 *Psst — looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
 ---
