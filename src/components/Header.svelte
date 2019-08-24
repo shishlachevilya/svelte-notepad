@@ -5,7 +5,7 @@
   import BigButton from "./BigButton.svelte";
 
   const dispatch = createEventDispatcher();
-  let src = "https://shishlachevilya.github.io/images/logo.svg";
+  let src = "./images/logo.svg";
   let alt = "notepad logo";
   let value = "";
 
@@ -45,53 +45,50 @@
     font-weight: 400;
     color: #fff;
     font-size: 26px;
+  }
+  .logo__link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    font-family: inherit;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  }
 
-    &__link {
-      position: relative;
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      color: inherit;
-      font-family: inherit;
-      transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    }
+  .logo:hover {
+    transform: scale(1.05);
+  }
 
-    &:hover {
-      transform: scale(1.05);
-    }
+  .logo:focus {
+    transform: scale(1.05);
+  }
 
-    &:focus {
-      transform: scale(1.05);
-    }
-
-    &__image {
-      margin-right: 4px;
-    }
+  .logo__image {
+    margin-right: 4px;
   }
 
   .search-form {
     position: relative;
+  }
+  .search-form__input {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.15);
+    width: 220px;
+    font: inherit;
+    border: 0;
+    padding: 8px 32px 8px 8px;
+    color: #fff;
+    transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    outline: none;
+  }
+  .search-form__input:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
 
-    &__input {
-      display: inline-block;
-      border-radius: 4px;
-      background-color: rgba(255, 255, 255, 0.15);
-      width: 220px;
-      font: inherit;
-      border: 0;
-      padding: 8px 32px 8px 8px;
-      color: #fff;
-      transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-      outline: none;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-      }
-
-      &:focus {
-        width: 270px;
-      }
-    }
+  .search-form__input:focus {
+    width: 270px;
   }
 
   .search-form__icon {

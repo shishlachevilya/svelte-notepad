@@ -25,7 +25,6 @@
   function deleteNote({ target }) {
     flag = !flag;
     const { id } = target.closest("li").dataset;
-    console.log(id);
     dispatch("delete", {
       id
     });
