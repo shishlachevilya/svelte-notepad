@@ -6,6 +6,12 @@
   import Popup from "./components/Popup.svelte";
   import shortid from "shortid";
 
+  const PRIORITY_TYPES = {
+    LOW: 0,
+    NORMAL: 1,
+    HIGH: 2
+  };
+
   let isOpen = false;
 
   let notes_value = [];
@@ -58,6 +64,58 @@
       return result;
     });
   }
+  function handleEditNote(event) {
+    const { id, title, body, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+
+      function updatedNote(t, b, p) {
+        note.title = t ? t : note.title;
+        note.body = b ? b : note.body;
+        note.priority = p ? p : note.priority;
+      }
+      updatedNote(title, body, priority);
+      const locale = localStorage
+        ? localStorage.setItem("key-note", JSON.stringify(arr))
+        : false;
+      return arr;
+    });
+  }
+  function handleIncrease(event) {
+    const { id, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+      const keys = Object.keys(PRIORITY_TYPES);
+      function updatedNote(p) {
+        note.priority =
+          PRIORITY_TYPES[p] > 1 ? note.priority : keys[PRIORITY_TYPES[p] + 1];
+      }
+      updatedNote(priority);
+      const locale = localStorage
+        ? localStorage.setItem("key-note", JSON.stringify(arr))
+        : false;
+      return arr;
+    });
+  }
+  function handleDecrease(event) {
+    const { id, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+      const keys = Object.keys(PRIORITY_TYPES);
+      function updatedNote(p) {
+        note.priority =
+          PRIORITY_TYPES[p] === 0 ? note.priority : keys[PRIORITY_TYPES[p] - 1];
+      }
+      updatedNote(priority);
+      const locale = localStorage
+        ? localStorage.setItem("key-note", JSON.stringify(arr))
+        : false;
+      return arr;
+    });
+  }
 </script>
 
 <style type="text/scss">
@@ -76,7 +134,15 @@
   <main class="container">
     <ul class="note-list">
       {#each filteredNotes as { id, title, body, priority }, i (id)}
-        <NoteItem {id} {title} {body} {priority} on:delete={handleDeleteNote} />
+        <NoteItem
+          {id}
+          {title}
+          {body}
+          {priority}
+          on:increase={handleIncrease}
+          on:decrease={handleDecrease}
+          on:delete={handleDeleteNote}
+          on:edit={handleEditNote} />
       {/each}
     </ul>
   </main>

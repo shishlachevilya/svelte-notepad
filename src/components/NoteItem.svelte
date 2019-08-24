@@ -14,7 +14,7 @@
 
   function editNote() {
     edit = !edit;
-    dispatch("saveLocal", {
+    dispatch("edit", {
       id,
       body,
       title,
@@ -27,6 +27,18 @@
     const { id } = target.closest("li").dataset;
     dispatch("delete", {
       id
+    });
+  }
+  function increasePrioriry(params) {
+    dispatch("increase", {
+      id,
+      priority
+    });
+  }
+  function decreasePrioriry(params) {
+    dispatch("decrease", {
+      id,
+      priority
     });
   }
 </script>
@@ -124,11 +136,13 @@
           <Button
             edit={false}
             icon={'expand_less'}
-            action={'increase-priority'} />
+            action={'increase-priority'}
+            on:click={increasePrioriry} />
           <Button
             edit={false}
             icon={'expand_more'}
-            action={'decrease-priority'} />
+            action={'decrease-priority'}
+            on:click={decreasePrioriry} />
           <span class="note__priority">Priority: {priority}</span>
         </section>
         <section class="note__section">
