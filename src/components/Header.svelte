@@ -1,7 +1,5 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { getLocalNotes } from "../helpres/getLocalNotes.js";
-  import { setLocalNotes } from "../helpres/setLocalNotes.js";
   import BigButton from "./BigButton.svelte";
 
   const dispatch = createEventDispatcher();
