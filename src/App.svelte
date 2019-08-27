@@ -1,69 +1,48 @@
 <script>
+  import { notes } from "./stores.js";
+
   import Header from "./components/Header.svelte";
   import NoteItem from "./components/NoteItem.svelte";
   import Popup from "./components/Popup.svelte";
   import shortid from "shortid";
-  import {getLocalNotes} from "./helpres/getLocalNotes.js";
-  import {setLocalNotes} from "./helpres/setLocalNotes.js";
+
+  const PRIORITY_TYPES = {
+    LOW: 0,
+    NORMAL: 1,
+    HIGH: 2
+  };
 
   let isOpen = false;
 
-  const INITIAL_NOTES = [
-    {
-      id: "XWaQXcbk0",
-      title: "JavaScript essentials",
-      body:
-          "Get comfortable with all basic JavaScript concepts: variables, loops, arrays, branching, objects, functions, scopes, prototypes etc",
-      priority: "HIGH"
-    },
-    {
-      id: "pkXzyRp1P",
-      title: "Refresh HTML and CSS",
-      body:
-          "Need to refresh HTML and CSS concepts, after learning some JavaScript. Maybe get to know CSS Grid and PostCSS, they seem to be trending.",
-      priority: "NORMAL"
-    },
-    {
-      id: "QMom9q4Ku",
-      title: "Get comfy with Frontend frameworks",
-      body:
-          "First must get some general knowledge about frameworks, then maybe try each one for a week or so. Need to choose between React, Vue and Angular, by reading articles and watching videos.",
-      priority: "NORMAL"
-    },
-    {
-      id: "k2k0UrjZG",
-      title: "Winter clothes",
-      body:
-          "Winter is coming! Need some really warm clothes: shoes, sweater, hat, jacket, scarf etc. Maybe should get a set of sportwear as well so I'll be able to do some excercises in the park.",
-      priority: "LOW"
-    }
-  ];
-
-  let notes = getLocalNotes() || INITIAL_NOTES;
+  let notes_value = [];
+  const unsubscribe = notes.subscribe(value => {
+    notes_value = [...value];
+  });
 
   const prefix = {
     query: ""
   };
 
   $: filteredNotes = prefix.query
-      ? notes.filter(note =>
-          note.body.toLowerCase().includes(prefix.query.toLowerCase())
+      ? notes_value.filter(
+          note =>
+              note.body.toLowerCase().includes(prefix.query.toLowerCase()) ||
+              note.title.toLowerCase().includes(prefix.query.toLowerCase())
       )
-      : notes;
+      : notes_value;
 
-  function newNote(event) {
-    notes = [
-      ...notes,
-      {
-        id: shortid.generate(),
-        title: event.detail.title,
-        body: event.detail.body,
-        priority: "LOW"
-      }
-    ];
-
+  function handleAddNote(event) {
+    notes.update(arr => {
+      const id = shortid.generate();
+      const priority = "LOW";
+      const { title, body } = event.detail;
+      const result = [...arr, { id, title, body, priority }];
+      const locale = localStorage
+          ? localStorage.setItem("key-note", JSON.stringify(result))
+          : false;
+      return result;
+    });
     isOpen = false;
-    setLocalNotes(notes);
   }
 
   function openHandle(event) {
@@ -76,17 +55,74 @@
   }
 
   function handleDeleteNote(event) {
-    const {id} = event.detail;
-    // ссылка на notes не должна меняться, поэтому мутируем объект
-    notes.splice(notes.indexOf(e => e.id === id), 1);
-    setLocalNotes(notes);
+    const { id } = event.detail;
+    notes.update(arr => {
+      const result = [...arr.filter(e => e.id !== id)];
+      const locale = localStorage
+          ? localStorage.setItem("key-note", JSON.stringify(result))
+          : false;
+      return result;
+    });
   }
 
-  function handleSaveLocal(event) {
-    const {id, title, body, priority} = event.detail;
-    let note = notes.find(e => e.id === id);
-    Object.assign(note, {id, title, body, priority});
-    setLocalNotes(notes);
+  function handleEditNote(event) {
+    const { id, title, body, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+
+      function updatedNote(t, b, p) {
+        note.title = t ? t : note.title;
+        note.body = b ? b : note.body;
+        note.priority = p ? p : note.priority;
+      }
+
+      updatedNote(title, body, priority);
+      const locale = localStorage
+          ? localStorage.setItem("key-note", JSON.stringify(arr))
+          : false;
+      return arr;
+    });
+  }
+
+  function handleIncrease(event) {
+    const { id, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+      const keys = Object.keys(PRIORITY_TYPES);
+
+      function updatedNote(p) {
+        note.priority =
+            PRIORITY_TYPES[p] > 1 ? note.priority : keys[PRIORITY_TYPES[p] + 1];
+      }
+
+      updatedNote(priority);
+      const locale = localStorage
+          ? localStorage.setItem("key-note", JSON.stringify(arr))
+          : false;
+      return arr;
+    });
+  }
+
+  function handleDecrease(event) {
+    const { id, priority } = event.detail;
+    notes.update(arr => {
+      const note = arr.find(e => e.id === id);
+      if (!note) return;
+      const keys = Object.keys(PRIORITY_TYPES);
+
+      function updatedNote(p) {
+        note.priority =
+            PRIORITY_TYPES[p] === 0 ? note.priority : keys[PRIORITY_TYPES[p] - 1];
+      }
+
+      updatedNote(priority);
+      const locale = localStorage
+          ? localStorage.setItem("key-note", JSON.stringify(arr))
+          : false;
+      return arr;
+    });
   }
 </script>
 
@@ -101,23 +137,25 @@
 </style>
 
 <div>
-  <Header on:search={filterNotes} on:modal={openHandle}/>
+<Header on:search={filterNotes} on:modal={openHandle}/>
 
   <main class="container">
     <ul class="note-list">
-      {#each filteredNotes as { id, title, body, priority }}
+      {#each filteredNotes as { id, title, body, priority }, i (id)}
         <NoteItem
             {id}
             {title}
             {body}
             {priority}
+            on:increase={handleIncrease}
+            on:decrease={handleDecrease}
             on:delete={handleDeleteNote}
-            on:saveLocal={handleSaveLocal}/>
+            on:edit={handleEditNote}/>
       {/each}
     </ul>
   </main>
 
   {#if isOpen}
-    <Popup on:note={newNote} on:modal={openHandle}/>
+    <Popup on:note={handleAddNote} on:modal={openHandle}/>
   {/if}
 </div>

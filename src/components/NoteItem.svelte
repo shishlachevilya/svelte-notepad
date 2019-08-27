@@ -14,7 +14,7 @@
 
   function editNote() {
     edit = !edit;
-    dispatch("saveLocal", {
+    dispatch("edit", {
       id,
       body,
       title,
@@ -25,9 +25,22 @@
   function deleteNote({ target }) {
     flag = !flag;
     const { id } = target.closest("li").dataset;
-    console.log(id);
     dispatch("delete", {
       id
+    });
+  }
+
+  function increasePrioriry(params) {
+    dispatch("increase", {
+      id,
+      priority
+    });
+  }
+
+  function decreasePrioriry(params) {
+    dispatch("decrease", {
+      id,
+      priority
     });
   }
 </script>
@@ -55,8 +68,9 @@
     border-radius: 4px;
     background-color: #fff;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
-      0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
   }
+
   .note__content {
     padding: 14px 0;
     flex-grow: 1;
@@ -103,9 +117,9 @@
       <div class="note__content">
         {#if edit}
           <h2
-            class="note__title edit"
-            contenteditable="true"
-            bind:textContent={title}>
+              class="note__title edit"
+              contenteditable="true"
+              bind:textContent={title}>
             {title}
           </h2>
         {:else}
@@ -113,9 +127,9 @@
         {/if}
         {#if edit}
           <p
-            class="note__body edit"
-            contenteditable="true"
-            bind:textContent={body} />
+              class="note__body edit"
+              contenteditable="true"
+              bind:textContent={body}/>
         {:else}
           <p class="note__body" contenteditable="false">{body}</p>
         {/if}
@@ -123,34 +137,36 @@
       <footer class="note__footer">
         <section class="note__section">
           <Button
-            edit={false}
-            icon={'expand_less'}
-            action={'increase-priority'} />
-          <Button
-            edit={false}
-            icon={'expand_more'}
-            action={'decrease-priority'} />
-          <span class="note__priority">Priority: {priority}</span>
+              edit={false}
+              icon={'expand_less'}
+              action={'increase-priority'}
+              on:click={increasePrioriry}/>
+            <Button
+                edit={false}
+                icon={'expand_more'}
+                action={'decrease-priority'}
+                on:click={decreasePrioriry}/>
+              <span class="note__priority">Priority: {priority}</span>
         </section>
         <section class="note__section">
           {#if edit}
-            <Button
+          <Button
               {edit}
               icon={'close'}
               action={'edit-note'}
-              on:click={editNote} />
+              on:click={editNote}/>
           {:else}
-            <Button
+          <Button
               {edit}
               icon={'edit'}
               action={'edit-note'}
-              on:click={editNote} />
+              on:click={editNote}/>
           {/if}
           <Button
-            edit={false}
-            icon={'delete'}
-            action={'delete-note'}
-            on:click={deleteNote} />
+              edit={false}
+              icon={'delete'}
+              action={'delete-note'}
+              on:click={deleteNote}/>
         </section>
       </footer>
     </div>
